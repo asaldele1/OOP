@@ -1,41 +1,29 @@
+import re
 import os
-from zipfile import ZipFile
+import json
 
-from more_itertools import chunked
+a = ['.\\Module_2\\Module_2.1\\Module_2.1.10', '.\\Module_2\\Module_2.1\\Module_2.1.11', '.\\Module_2\\Module_2.1\\Module_2.1.12', '.\\Module_2\\Module_2.1\\Module_2.1.13', '.\\Module_2\\Module_2.1\\Module_2.1.14', '.\\Module_2\\Module_2.1\\Module_2.1.15', '.\\Module_2\\Module_2.1\\Module_2.1.16', '.\\Module_2\\Module_2.1\\Module_2.1.17', '.\\Module_2\\Module_2.1\\Module_2.1.18', '.\\Module_2\\Module_2.1\\Module_2.1.4', '.\\Module_2\\Module_2.1\\Module_2.1.5', '.\\Module_2\\Module_2.1\\Module_2.1.6', '.\\Module_2\\Module_2.1\\Module_2.1.7', '.\\Module_2\\Module_2.1\\Module_2.1.8', '.\\Module_2\\Module_2.1\\Module_2.1.9', '.\\Module_4\\Module_4.3\\Module_4.3.10', '.\\Module_4\\Module_4.3\\Module_4.3.11', '.\\Module_4\\Module_4.3\\Module_4.3.12', '.\\Module_4\\Module_4.3\\Module_4.3.13', '.\\Module_4\\Module_4.3\\Module_4.3.14', '.\\Module_4\\Module_4.3\\Module_4.3.15', '.\\Module_4\\Module_4.3\\Module_4.3.16', '.\\Module_4\\Module_4.3\\Module_4.3.2', '.\\Module_4\\Module_4.3\\Module_4.3.3', '.\\Module_4\\Module_4.3\\Module_4.3.4', '.\\Module_4\\Module_4.3\\Module_4.3.5', '.\\Module_4\\Module_4.3\\Module_4.3.6', '.\\Module_4\\Module_4.3\\Module_4.3.7', '.\\Module_4\\Module_4.3\\Module_4.3.8', '.\\Module_4\\Module_4.3\\Module_4.3.9', '.\\Module_4\\Module_4.4\\Module_4.4.15', '.\\Module_4\\Module_4.4\\Module_4.4.16', '.\\Module_4\\Module_4.4\\Module_4.4.17', '.\\Module_4\\Module_4.5\\Module_4.5.13', '.\\Module_4\\Module_4.5\\Module_4.5.14', '.\\Module_4\\Module_4.5\\Module_4.5.15', '.\\Module_4\\Module_4.6\\Module_4.6.13', '.\\Module_4\\Module_4.6\\Module_4.6.14', '.\\Module_4\\Module_4.6\\Module_4.6.15', '.\\Module_4\\Module_4.6\\Module_4.6.16', '.\\Module_4\\Module_4.7\\Module_4.7.11', '.\\Module_4\\Module_4.7\\Module_4.7.12', '.\\Module_4\\Module_4.7\\Module_4.7.13', '.\\Module_4\\Module_4.7\\Module_4.7.14', '.\\Module_4\\Module_4.7\\Module_4.7.15', '.\\Module_4\\Module_4.7\\Module_4.7.16', '.\\Module_4\\Module_4.8\\Module_4.8.16', '.\\Module_4\\Module_4.8\\Module_4.8.17', '.\\Module_4\\Module_4.8\\Module_4.8.18', '.\\Module_4\\Module_4.8\\Module_4.8.19', '.\\Module_5\\Module_5.1\\Module_5.1.15', '.\\Module_5\\Module_5.10\\Module_5.10.13', '.\\Module_5\\Module_5.10\\Module_5.10.14', '.\\Module_5\\Module_5.2\\Module_5.2.13', '.\\Module_5\\Module_5.2\\Module_5.2.14', '.\\Module_5\\Module_5.2\\Module_5.2.15', '.\\Module_5\\Module_5.2\\Module_5.2.16', '.\\Module_5\\Module_5.2\\Module_5.2.17', '.\\Module_5\\Module_5.2\\Module_5.2.18', '.\\Module_5\\Module_5.3\\Module_5.3.11', '.\\Module_5\\Module_5.3\\Module_5.3.18', '.\\Module_5\\Module_5.3\\Module_5.3.19', '.\\Module_5\\Module_5.3\\Module_5.3.20', '.\\Module_5\\Module_5.4\\Module_5.4.10', '.\\Module_5\\Module_5.4\\Module_5.4.11', '.\\Module_5\\Module_5.4\\Module_5.4.12', '.\\Module_5\\Module_5.4\\Module_5.4.13', '.\\Module_5\\Module_5.4\\Module_5.4.14', '.\\Module_5\\Module_5.5\\Module_5.5.10', '.\\Module_5\\Module_5.5\\Module_5.5.11', '.\\Module_5\\Module_5.5\\Module_5.5.20', '.\\Module_5\\Module_5.5\\Module_5.5.21', '.\\Module_5\\Module_5.5\\Module_5.5.9', '.\\Module_5\\Module_5.6\\Module_5.6.10', '.\\Module_5\\Module_5.6\\Module_5.6.11', '.\\Module_5\\Module_5.6\\Module_5.6.12', '.\\Module_5\\Module_5.6\\Module_5.6.13', '.\\Module_5\\Module_5.6\\Module_5.6.14', '.\\Module_5\\Module_5.6\\Module_5.6.15', '.\\Module_5\\Module_5.6\\Module_5.6.16', '.\\Module_5\\Module_5.6\\Module_5.6.17', '.\\Module_5\\Module_5.6\\Module_5.6.18', '.\\Module_5\\Module_5.6\\Module_5.6.9', '.\\Module_5\\Module_5.7\\Module_5.7.10', '.\\Module_5\\Module_5.7\\Module_5.7.11', '.\\Module_5\\Module_5.7\\Module_5.7.12', '.\\Module_5\\Module_5.8\\Module_5.8.10', '.\\Module_5\\Module_5.8\\Module_5.8.11', '.\\Module_5\\Module_5.8\\Module_5.8.12', '.\\Module_5\\Module_5.8\\Module_5.8.13', '.\\Module_5\\Module_5.8\\Module_5.8.14', '.\\Module_5\\Module_5.8\\Module_5.8.15', '.\\Module_5\\Module_5.8\\Module_5.8.8', '.\\Module_5\\Module_5.8\\Module_5.8.9', '.\\Module_5\\Module_5.9\\Module_5.9.24', '.\\Module_5\\Module_5.9\\Module_5.9.25', '.\\Module_6\\Module_6.1\\Module_6.1.15', '.\\Module_6\\Module_6.1\\Module_6.1.16', '.\\Module_6\\Module_6.1\\Module_6.1.17', '.\\Module_6\\Module_6.1\\Module_6.1.18', '.\\Module_6\\Module_6.1\\Module_6.1.19', '.\\Module_6\\Module_6.1\\Module_6.1.20', '.\\Module_6\\Module_6.1\\Module_6.1.21', '.\\Module_6\\Module_6.2\\Module_6.2.10', '.\\Module_6\\Module_6.2\\Module_6.2.11', '.\\Module_6\\Module_6.2\\Module_6.2.12', '.\\Module_6\\Module_6.2\\Module_6.2.13', '.\\Module_6\\Module_6.2\\Module_6.2.14', '.\\Module_6\\Module_6.2\\Module_6.2.15', '.\\Module_6\\Module_6.2\\Module_6.2.16', '.\\Module_6\\Module_6.2\\Module_6.2.17', '.\\Module_6\\Module_6.2\\Module_6.2.18', '.\\Module_6\\Module_6.2\\Module_6.2.19', '.\\Module_6\\Module_6.3\\Module_6.3.13', '.\\Module_6\\Module_6.3\\Module_6.3.14', '.\\Module_6\\Module_6.3\\Module_6.3.15', '.\\Module_6\\Module_6.4\\Module_6.4.21', '.\\Module_6\\Module_6.5\\Module_6.5.10', '.\\Module_6\\Module_6.5\\Module_6.5.11', '.\\Module_6\\Module_6.5\\Module_6.5.12', '.\\Module_6\\Module_6.5\\Module_6.5.13', '.\\Module_6\\Module_6.5\\Module_6.5.16', '.\\Module_6\\Module_6.5\\Module_6.5.17', '.\\Module_6\\Module_6.5\\Module_6.5.18', '.\\Module_6\\Module_6.5\\Module_6.5.5', '.\\Module_6\\Module_6.5\\Module_6.5.6', '.\\Module_6\\Module_6.5\\Module_6.5.7', '.\\Module_6\\Module_6.5\\Module_6.5.8', '.\\Module_6\\Module_6.5\\Module_6.5.9', '.\\Module_6\\Module_6.6\\Module_6.6.17', '.\\Module_6\\Module_6.6\\Module_6.6.18', '.\\Module_6\\Module_6.6\\Module_6.6.19', '.\\Module_6\\Module_6.6\\Module_6.6.20', '.\\Module_6\\Module_6.8\\Module_6.8.15', '.\\Module_6\\Module_6.8\\Module_6.8.16', '.\\Module_6\\Module_6.8\\Module_6.8.17', '.\\Module_6\\Module_6.8\\Module_6.8.18', '.\\Module_6\\Module_6.8\\Module_6.8.19', '.\\Module_6\\Module_6.8\\Module_6.8.20', '.\\Module_7\\Module_7.1\\Module_7.1.23', '.\\Module_7\\Module_7.1\\Module_7.1.24', '.\\Module_7\\Module_7.1\\Module_7.1.25', '.\\Module_7\\Module_7.1\\Module_7.1.26', '.\\Module_7\\Module_7.1\\Module_7.1.27', '.\\Module_7\\Module_7.1\\Module_7.1.28', '.\\Module_7\\Module_7.2\\Module_7.2.16', '.\\Module_7\\Module_7.2\\Module_7.2.17', '.\\Module_7\\Module_7.2\\Module_7.2.18', '.\\Module_7\\Module_7.2\\Module_7.2.19', '.\\Module_7\\Module_7.2\\Module_7.2.20', '.\\Module_7\\Module_7.2\\Module_7.2.21', '.\\Module_7\\Module_7.3\\Module_7.3.13', '.\\Module_7\\Module_7.3\\Module_7.3.14', '.\\Module_7\\Module_7.3\\Module_7.3.15', '.\\Module_7\\Module_7.3\\Module_7.3.16', '.\\Module_7\\Module_7.3\\Module_7.3.17', '.\\Module_7\\Module_7.3\\Module_7.3.18', '.\\Module_7\\Module_7.3\\Module_7.3.19', '.\\Module_7\\Module_7.3\\Module_7.3.20', '.\\Module_7\\Module_7.4\\Module_7.4.16', '.\\Module_7\\Module_7.4\\Module_7.4.17', '.\\Module_7\\Module_7.4\\Module_7.4.18', '.\\Module_7\\Module_7.4\\Module_7.4.19', '.\\Module_7\\Module_7.4\\Module_7.4.20', '.\\Module_7\\Module_7.4\\Module_7.4.21', '.\\Module_7\\Module_7.4\\Module_7.4.22', '.\\Module_7\\Module_7.4\\Module_7.4.23', '.\\Module_7\\Module_7.5\\Module_7.5.11', '.\\Module_7\\Module_7.5\\Module_7.5.12', '.\\Module_7\\Module_7.5\\Module_7.5.13', '.\\Module_7\\Module_7.5\\Module_7.5.22', '.\\Module_7\\Module_7.5\\Module_7.5.23', '.\\Module_7\\Module_7.5\\Module_7.5.24', '.\\Module_7\\Module_7.5\\Module_7.5.25', '.\\Module_7\\Module_7.5\\Module_7.5.26', '.\\Module_7\\Module_7.6\\Module_7.6.21', '.\\Module_7\\Module_7.6\\Module_7.6.22', '.\\Module_7\\Module_7.6\\Module_7.6.23', '.\\Module_7\\Module_7.6\\Module_7.6.24', '.\\Module_7\\Module_7.6\\Module_7.6.25', '.\\Module_7\\Module_7.7\\Module_7.7.11', '.\\Module_7\\Module_7.7\\Module_7.7.12', '.\\Module_7\\Module_7.7\\Module_7.7.13', '.\\Module_7\\Module_7.8\\Module_7.8.10', '.\\Module_7\\Module_7.8\\Module_7.8.11', '.\\Module_7\\Module_7.8\\Module_7.8.12', '.\\Module_7\\Module_7.8\\Module_7.8.13', '.\\Module_7\\Module_7.8\\Module_7.8.9', '.\\Module_8\\Module_8.1\\Module_8.1.13', '.\\Module_8\\Module_8.2\\Module_8.2.23', '.\\Module_8\\Module_8.2\\Module_8.2.24', '.\\Module_8\\Module_8.2\\Module_8.2.25', '.\\Module_8\\Module_8.3\\Module_8.3.15', '.\\Module_8\\Module_8.3\\Module_8.3.16', '.\\Module_8\\Module_8.4\\Module_8.4.10', '.\\Module_8\\Module_8.4\\Module_8.4.11', '.\\Module_8\\Module_8.4\\Module_8.4.12', '.\\Module_8\\Module_8.4\\Module_8.4.13', '.\\Module_8\\Module_8.4\\Module_8.4.14', '.\\Module_8\\Module_8.4\\Module_8.4.15', '.\\Module_8\\Module_8.4\\Module_8.4.16', '.\\Module_8\\Module_8.5\\Module_8.5.10', '.\\Module_8\\Module_8.5\\Module_8.5.11', '.\\Module_8\\Module_8.5\\Module_8.5.12', '.\\Module_8\\Module_8.5\\Module_8.5.13', '.\\Module_8\\Module_8.5\\Module_8.5.14', '.\\Module_8\\Module_8.5\\Module_8.5.15', '.\\Module_8\\Module_8.5\\Module_8.5.16', '.\\Module_8\\Module_8.6\\Module_8.6.24', '.\\Module_8\\Module_8.6\\Module_8.6.25', '.\\Module_8\\Module_8.6\\Module_8.6.26', '.\\Module_8\\Module_8.6\\Module_8.6.27', '.\\Module_9\\Module_9.1\\Module_9.1.1', '.\\Module_9\\Module_9.1\\Module_9.1.10', '.\\Module_9\\Module_9.1\\Module_9.1.11', '.\\Module_9\\Module_9.1\\Module_9.1.12', '.\\Module_9\\Module_9.1\\Module_9.1.13', '.\\Module_9\\Module_9.1\\Module_9.1.14', '.\\Module_9\\Module_9.1\\Module_9.1.2', '.\\Module_9\\Module_9.1\\Module_9.1.3', '.\\Module_9\\Module_9.1\\Module_9.1.4', '.\\Module_9\\Module_9.1\\Module_9.1.5', '.\\Module_9\\Module_9.1\\Module_9.1.6', '.\\Module_9\\Module_9.1\\Module_9.1.7', '.\\Module_9\\Module_9.1\\Module_9.1.8', '.\\Module_9\\Module_9.1\\Module_9.1.9']
 
-
-def create_test_files(archive, extract_path):
-    if not os.path.exists(extract_path):
-        os.mkdir(extract_path)
-
-    with (
-        ZipFile(f'{archive}') as zf,
-        open(f'{extract_path}/input.txt', 'w', encoding='utf-8') as inp,
-        open(f'{extract_path}/output.txt', 'w', encoding='utf-8') as out
-    ):
-        files_pairs = chunked(zf.namelist(), 2)
-        inp.write('# INPUT DATA:\n\n')
-        out.write('# OUTPUT DATA:\n\n')
-        test_number = 1
-        for reply, clue in files_pairs:
-            with zf.open(reply) as f_reply, zf.open(clue) as f_clue:
-                inp.writelines(f'# TEST_{test_number}:\n{f_reply.read().decode()}\n\n')
-                out.writelines(f'# TEST_{test_number}:\n{f_clue.read().decode()}\n\n')
-                test_number += 1
-
-
-def scan_dir(path):
-    for i in os.listdir(path):
-        directory = path + '/' + i
-        if directory.endswith('.zip'):
-            extract_path, zip_file = os.path.split(directory)
-            module_number = f"{extract_path.split('/')[-1]}.{zip_file.split('.')[0]}"
-            mkdir = f'{extract_path}/{module_number}'
-            create_test_files(directory, mkdir)
-        if os.path.isdir(path + '/' + i):
-            scan_dir(path + '/' + i)
-
-
-if __name__ == '__main__':
-    path = '.'
-    scan_dir(path)
+# for i in a:
+#     data = {}
+for i in a:
+    j = {}
+    print(i)
+    with open(f"{i}\\input.txt", "r", encoding="utf-8") as r:
+        inputs = [_.strip() for _ in re.split(r"\n\n# TEST_([0-9]|[1-9][0-9]|[1-9][0-9][0-9]):", r.read().split("# INPUT DATA:")[1])[2::2]]
+    with open(f"{i}\\output.txt", "r", encoding="utf-8") as r:
+        outputs = [_.strip() for _ in re.split(r"\n\n# TEST_([0-9]|[1-9][0-9]|[1-9][0-9][0-9]):", r.read().split("# OUTPUT DATA:")[1])[2::2]]
+    j["name"] = "OOP: " + i.split("_")[-1]
+    with open(i + "\\..\\url") as r:
+        ur = r.read()
+    j["url"] = ur + i.split(".")[-1]
+    j["tests"] = []
+    j["interactive"] = False
+    j["memoryLimit"] = 256
+    j["timeLimit"] = 15000
+    j["srcPath"] = os.path.abspath(i + "\\problem.py")
+    j["group"] = "OOP"
+    for h in range(len(inputs)):
+        j["tests"].append({"id": h, "input": inputs[h], "output": outputs[h]})
+    with open(i + "\\template.prob", "w", encoding="utf-8") as w:
+        w.write(json.dumps(j))
